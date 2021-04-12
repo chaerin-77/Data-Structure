@@ -156,6 +156,29 @@ int insertFirst(headNode* h, int key) {
 /* 리스트를 검색하여, 입력받은 key보다 큰값이 나오는 노드 바로 앞에 삽입 */
 int insertNode(headNode* h, int key) {
 
+	listNode* n;
+	listNode* trail = NULL;
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	n = h->first;
+	node->key = key;
+
+	if(n == NULL){
+		n->link = node;
+		node->link = NULL;
+	}
+	
+	else{
+
+		while(n->key >= node->key){
+
+				trail = n;
+				n = n->link;
+		}
+
+		trail->link = node;
+		node->link = n;
+	}
+
 	return 0;
 }
 
@@ -163,6 +186,25 @@ int insertNode(headNode* h, int key) {
  * list에 key에 대한 노드하나를 추가
  */
 int insertLast(headNode* h, int key) {
+
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	listNode* n;
+	n = h->first;
+	node->key = key;
+	node->link = NULL;
+
+	if(n == NULL)
+	{
+		h->first = node;
+	}
+
+	else
+	{
+		while(n->link != NULL)
+			n = n->link;
+		
+		n->link = node;
+	}
 
 	return 0;
 }
@@ -172,7 +214,17 @@ int insertLast(headNode* h, int key) {
  * list의 첫번째 노드 삭제
  */
 int deleteFirst(headNode* h) {
+	
+	listNode* n = (listNode*)malloc(sizeof(listNode));
+	n = h->first;
 
+	if(n == NULL)
+		printf("Linked list is Empty!!");
+	
+	else{
+		h->first = n->link;
+		free(n);
+	}
 
 	return 0;
 }
@@ -182,9 +234,25 @@ int deleteFirst(headNode* h) {
  * list에서 key에 대한 노드 삭제
  */
 int deleteNode(headNode* h, int key) {
+	
+	listNode* n = (listNode*)malloc(sizeof(listNode));
+	listNode* trail = NULL;
+	n = h->first;
+
+	if(n == NULL)
+		printf("Linked list is Empty!!");
+	
+	else{
+		while(n->key != key){
+			trail = n;
+			n = n->link;
+		}
+		
+		trail->link = n->link;
+		free(n);
+	}
 
 	return 0;
-
 }
 
 /**
