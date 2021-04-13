@@ -163,20 +163,32 @@ int insertNode(headNode* h, int key) {
 	node->key = key;
 
 	if(n == NULL){
-		n->link = node;
+		h->first = node;
 		node->link = NULL;
 	}
 	
 	else{
-
-		while(n->key >= node->key){
-
-				trail = n;
-				n = n->link;
+		
+		if(n->key >= node->key){
+			node->link = n;
+			h->first = node;
 		}
 
-		trail->link = node;
-		node->link = n;
+		else{
+			
+			while(n->key < node->key){
+				if (n->link == NULL && n->key <= node->key){
+					node->link = n->link;
+					n->link = node;
+					return 0;
+				}
+				trail = n;
+				n = n->link;
+			}
+		
+			trail->link = node;
+			node->link = n;
+		}
 	}
 
 	return 0;
@@ -215,7 +227,7 @@ int insertLast(headNode* h, int key) {
  */
 int deleteFirst(headNode* h) {
 	
-	listNode* n = (listNode*)malloc(sizeof(listNode));
+	listNode* n;
 	n = h->first;
 
 	if(n == NULL)
@@ -235,7 +247,7 @@ int deleteFirst(headNode* h) {
  */
 int deleteNode(headNode* h, int key) {
 	
-	listNode* n = (listNode*)malloc(sizeof(listNode));
+	listNode* n;
 	listNode* trail = NULL;
 	n = h->first;
 
@@ -243,13 +255,21 @@ int deleteNode(headNode* h, int key) {
 		printf("Linked list is Empty!!");
 	
 	else{
-		while(n->key != key){
-			trail = n;
-			n = n->link;
+		if(n->key == key){
+			h->first = n->link;
+			free(n);
 		}
+
+		else
+		{
+			while(n->key != key){
+				trail = n;
+				n = n->link;
+			}
 		
-		trail->link = n->link;
-		free(n);
+			trail->link = n->link;
+			free(n);
+		}
 	}
 
 	return 0;
@@ -260,6 +280,27 @@ int deleteNode(headNode* h, int key) {
  */
 int deleteLast(headNode* h) {
 
+	listNode* n, *trail;
+	n = h->first;
+	trail = NULL;
+
+	if(n == NULL)
+		printf("Linked list is Empty!!");
+	
+	else{
+		if(n->link == NULL){
+			
+		}
+		while(n->link != NULL){
+			trail = n;
+			n = n->link;
+		}
+		
+		trail->link = NULL;
+		free(n);
+	}
+
+
 	return 0;
 }
 
@@ -268,6 +309,18 @@ int deleteLast(headNode* h) {
  * 리스트의 링크를 역순으로 재 배치
  */
 int invertList(headNode* h) {
+
+	listNode* next, *trail, *n;
+	next = trail = NULL;
+	n = h->first;
+
+	while(n){
+		next = n->link;
+		n->link = trail;
+		trail = n;
+		n = next;
+	}
+	h->first = trail;
 
 	return 0;
 }
