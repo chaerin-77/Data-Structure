@@ -9,7 +9,7 @@
  *
  */
 
-// 깃허브 commit 기능 확인
+// 깃허브 commit 기능 확인하겠습니다...
 
 
 #include<stdio.h>
