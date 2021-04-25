@@ -9,8 +9,6 @@
  *
  */
 
-// 깃허브 commit 기능 확인하겠습니다...
-
 
 #include<stdio.h>
 #include<stdlib.h>
@@ -75,42 +73,42 @@ int main()
 
 		switch(command) {
 		case 'z': case 'Z':
-			initialize(&headnode);
+			initialize(&headnode); // headnode의 주소를 값으로 넘겼기 때문에 이중 포인터로 받아야 함
 			break;
 		case 'p': case 'P':
-			printList(headnode);
+			printList(headnode); // 리스트를 출력함
 			break;
 		case 'i': case 'I':
 			printf("Your Key = ");
 			scanf("%d", &key);
-			insertNode(headnode, key);
+			insertNode(headnode, key); // key를 입력받아 해당 데이터값을 비교한 후 오름차순으로 정렬하여 입력
 			break;
 		case 'd': case 'D':
 			printf("Your Key = ");
 			scanf("%d", &key);
-			deleteNode(headnode, key);
+			deleteNode(headnode, key); // 해당 key값을 가지는 node 삭제
 			break;
 		case 'n': case 'N':
 			printf("Your Key = ");
 			scanf("%d", &key);
-			insertLast(headnode, key);
+			insertLast(headnode, key); // 마지막에 node 추가
 			break;
 		case 'e': case 'E':
-			deleteLast(headnode);
+			deleteLast(headnode); // 마지막 node 삭제
 			break;
 		case 'f': case 'F':
 			printf("Your Key = ");
 			scanf("%d", &key);
-			insertFirst(headnode, key);
+			insertFirst(headnode, key); // 맨 앞에 node 추가
 			break;
 		case 't': case 'T':
-			deleteFirst(headnode);
+			deleteFirst(headnode); // 맨 앞 node 삭제
 			break;
 		case 'r': case 'R':
-			invertList(headnode);
+			invertList(headnode); // node 역순으로 정렬
 			break;
 		case 'q': case 'Q':
-			freeList(headnode);
+			freeList(headnode); // 사용했던 리스트 해제
 			break;
 		default:
 			printf("\n       >>>>>   Concentration!!   <<<<<     \n");
@@ -125,12 +123,12 @@ int main()
 
 int initialize(headNode** h) {
 
-	/* headNode가 NULL이 아니면, freeNode를 호출하여 할당된 메모리 모두 해제 */
+	
 	if(*h != NULL)
-		freeList(*h);
+		freeList(*h); // headNode가 NULL이 아니면 할당된 메모리 모두 해제
 
-	/* headNode에 대한 메모리를 할당하여 리턴 */
-	(*h) = (headNode*)malloc(sizeof(headNode));
+	
+	(*h) = (headNode*)malloc(sizeof(headNode));// headNode에 대한 메모리를 할당하여 리턴
 	(*h)->first = NULL;
 
 	return 1;
@@ -142,9 +140,9 @@ int freeList(headNode* h){
 	listNode* prev = NULL;
 
 	while(p != NULL) {
-		prev = p;
-		p = p->rlink;
-		free(prev); // h와 연결된 리스트 해제
+		prev = p; // 이전 노드를 p로 변경
+		p = p->rlink; // p는 다음 노드를 가리키도록 변경
+		free(prev); // 노드를 하나씩 해제
 	}
 	free(h); // 마지막으로 h도 해제
 
@@ -153,13 +151,14 @@ int freeList(headNode* h){
 
 
 void printList(headNode* h) {
+
 	int i = 0;
 	listNode* p;
 
 	printf("\n---PRINT\n");
 
 	if(h == NULL) {
-		printf("Nothing to print....\n");
+		printf("Nothing to print....\n"); // node가 비어있으면 출력할 게 없다는 문자열을 출력
 		return;
 	}
 
@@ -167,11 +166,11 @@ void printList(headNode* h) {
 
 	while(p != NULL) {
 		printf("[ [%d]=%d ] ", i, p->key);
-		p = p->rlink;
+		p = p->rlink; // p를 하나씩 이동시켜 모든 리스트의 key값 출력
 		i++;
 	}
 
-	printf("  items = %d\n", i);
+	printf("  items = %d\n", i); // 모든 item의 갯수 출력
 }
 
 
@@ -186,20 +185,20 @@ int insertLast(headNode* h, int key) {
 	listNode* n;
 	n = h->first;
 	node->key = key;
-	node->rlink = NULL; 
+	node->rlink = NULL; // node를 항상 마지막에 추가하는 함수이기 때문에 rlink는 항상 NULL
 
 	if(n == NULL)
 	{
-		h->first = node; 
+		h->first = node; // 만약 리스트가 비어있을 때 처음 추가하게 되는 것이라면 바로 추가
 	}
 
 	else
 	{
 		while(n->rlink != NULL) 
-			n = n->rlink;
+			n = n->rlink; // n의 rlink가 NULL 일 때까지, 즉 마지막 순서까지 n을 증가시킴
 		
-		n->rlink = node; 
-		node->llink = n;
+		n->rlink = node; // n의 rlink가 새로 추가할 node를 가리키게 함
+		node->llink = n; // 새로 추가한 node의 llink가 n을 가리키게 함
 	}
 
 	return 0;
@@ -231,7 +230,7 @@ int deleteLast(headNode* h) {
 			n = n->rlink; // n이 다음 노드를 가리키도록 변경
 		}
 		// 리스트의 마지막 노드라면
-		trail->rlink = NULL; // 이전 노드의 link를 NULL로 변경
+		trail->rlink = NULL; // 이전 노드의 rlink를 NULL로 변경
 		free(n); // 마지막 노드인 n 해제
 	}
 
@@ -248,8 +247,9 @@ int insertFirst(headNode* h, int key) {
 	listNode* node = (listNode*)malloc(sizeof(listNode));
 	node->key = key;
 
-	node->rlink = h->first;
-	h->first = node;
+	node->rlink = h->first; // node를 처음에 넣는 것이기 때문에 first가 가리키는 노드를 새로 추가할 node의 rlink가 가리키도록 함
+	h->first->llink = node; // first가 가리키는 node의 llink가 새로 추가할 노드를 가리키도록 함
+	h->first = node; // first가 새로 추가할 노드를 가리키도록 변경
 
 	return 0;
 }
@@ -266,7 +266,7 @@ int deleteFirst(headNode* h) {
 		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
 	
 	else{
-		h->first = n->rlink; // 첫 번째 노드를 삭제하기 때문에 first가 가리키는 값을 n의 다음 노드 값으로 변경한 후
+		h->first = n->rlink; // first가 가리키는 값을 n의 다음 노드 값으로 변경한 후
 		free(n); // n의 메모리 해제
 	}
 
@@ -286,12 +286,12 @@ int invertList(headNode* h) {
 
 	while(n){
 		next = n->rlink; // next가 현재 노드의 다음 노드를 가리키도록 변경
-		n->rlink = trail; // 현재 노드의 link는 이전 노드를 가리키도록 변경
-		n->llink = next;
+		n->rlink = trail; // 현재 노드의 rlink는 이전 노드를 가리키도록 변경
+		n->llink = next; // n의 llink는 다음 노드를 가리키도록 변경
 		trail = n; // 이전 노드는 현재 노드를 가리키도록 변경
 		n = next; // 현재 노드 n은 다음 노드를 가리키도록 변경
 	}
-	h->first = trail; // 마지막으로 first가 가리키는 값을 trail로 변경
+	h->first = trail; // 마지막으로 first가 마지막 노드를 가리키도록 함
 
 
 	return 0;
@@ -310,14 +310,14 @@ int insertNode(headNode* h, int key) {
 
 	if(n == NULL){
 		h->first = node; // 만약 리스트가 비어있었다면 first가 가리키고 있는 노드를 node로 변경
-		node->rlink = NULL; // node의 link는 NULL값으로 변경
+		node->rlink = NULL; // node의 rlink는 NULL값으로 변경
 	}
 	
 	else{
 		
 		if(h->first->key >= node->key){// 만약 입력받은 키 값이 n이 가리키고 있는 키 값보다 작으면 바로 추가
-			node->rlink = n; // 새로 추가할 node의 link를 n을 가리키도록 수정
-			n->llink = node;
+			node->rlink = n; // 새로 추가할 node의 rlink가 n을 가리키도록 수정
+			n->llink = node; // 원래 있던 node인 n의 llink가 새로 추가할 노드를 가리키도록 변경
 			h->first = node; // first가 가리키는 노드를 node로 변경
 		}
 
@@ -326,9 +326,9 @@ int insertNode(headNode* h, int key) {
 			while(n->key < node->key){ // 입력받은 키 값이 n이 가리키고 있는 키 값보다 클 때까지
 				
 				if (n->rlink == NULL && n->key <= node->key){ // 즉 새로 추가할 node의 키 값이 현재 리스트의 모든 키 값보다 클 경우
-					node->rlink = n->rlink; // node의 link를 n의 링크 즉 NULL로 변경
-					n->rlink = node; // n의 link를 node를 가리키도록 변경
-					node->llink = n;
+					node->rlink = n->rlink; // node의 rlink를 n의 링크 즉 NULL로 변경
+					n->rlink = node; // n의 rlink를 node를 가리키도록 변경
+					node->llink = n; // node의 llink가 n을 가리키도록 변경
 
 					return 0;
 				}
@@ -337,10 +337,10 @@ int insertNode(headNode* h, int key) {
 			}
 			// 리스트를 하나씩 비교하다 입력 받은 키 값보다 n이 가리키는 키 값이 더 클 경우
 
-			trail->rlink = node; // 이전 노드의 링크가 node를 가리키도록 변경
-			node->rlink = n;// node의 link가 n을 가리키도록 변경
-			n->llink = node;
-			node->llink = trail;
+			trail->rlink = node; // 이전 노드의 rlink가 node를 가리키도록 변경
+			node->rlink = n;// 새로 추가할 node의 rlink가 n을 가리키도록 변경
+			n->llink = node; // n의 llink는 새로 추가할 노드를 가리키도록 변경
+			node->llink = trail; // node의 llink는 이전 노드를 가리키도록 변경
 		}
 	}
 
@@ -372,13 +372,17 @@ int deleteNode(headNode* h, int key) {
 				trail = n; // 이전 노드를 가리키는 trail 값을 n으로 변경
 				n = n->rlink; // n은 n의 다음 노드를 가리키도록 변경
 
-				if(n == NULL)
-					printf("There is no such node!!\n\n");
+				if(n == NULL) // n이 마지막 값인 NULL 까지 증가하였는데 해당되는 값이 없을 경우
+				{
+					printf("There is no such node!!\n\n"); // 해당되는 노드가 없다는 문자열 출력
+					return 0;
+				}
+
 			}
 			// n의 키 값이 삭제할 키 값과 같다면
 
-			trail->rlink = n->rlink; // 이전 노드의 link 값을 n의 다음 노드를 가리키도록 변경
-			n->rlink->llink = trail;
+			trail->rlink = n->rlink; // 이전 노드의 rlink 값을 n의 다음 노드를 가리키도록 변경
+			n->rlink->llink = trail; // n의 다음 노드의 llink가 이전 노드를 가리키도록 변경 후
 			free(n); //n 해제
 		}
 	}
