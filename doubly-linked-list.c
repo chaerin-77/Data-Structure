@@ -130,10 +130,8 @@ int initialize(headNode** h) {
 		freeList(*h);
 
 	/* headNode에 대한 메모리를 할당하여 리턴 */
-	*h = (listNode*)malloc(sizeof(listNode));
-	(*h)->first->rlink = *h;
-	(*h)->first->llink = *h;
-	(*h)->first->key = -9999;
+	(*h) = (headNode*)malloc(sizeof(headNode));
+	(*h)->first = NULL;
 
 	return 1;
 }
@@ -289,6 +287,7 @@ int invertList(headNode* h) {
 	while(n){
 		next = n->rlink; // next가 현재 노드의 다음 노드를 가리키도록 변경
 		n->rlink = trail; // 현재 노드의 link는 이전 노드를 가리키도록 변경
+		n->llink = next;
 		trail = n; // 이전 노드는 현재 노드를 가리키도록 변경
 		n = next; // 현재 노드 n은 다음 노드를 가리키도록 변경
 	}
@@ -372,6 +371,9 @@ int deleteNode(headNode* h, int key) {
 			while(n->key != key){ // n의 키 값이 삭제할 키값과 같지 않을 때까지
 				trail = n; // 이전 노드를 가리키는 trail 값을 n으로 변경
 				n = n->rlink; // n은 n의 다음 노드를 가리키도록 변경
+
+				if(n == NULL)
+					printf("There is no such node!!\n\n");
 			}
 			// n의 키 값이 삭제할 키 값과 같다면
 
