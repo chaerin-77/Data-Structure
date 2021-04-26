@@ -125,6 +125,16 @@ int initialize(listNode** h) {
 /* 메모리 해제 */
 int freeList(listNode* h){
 
+	listNode* p = h;
+	listNode* prev = NULL;
+
+	while(p != NULL) {
+		prev = p; // 이전 노드를 p로 변경
+		p = p->rlink; // p는 다음 노드를 가리키도록 변경
+		free(prev); // 노드를 하나씩 해제
+	}
+	free(h); // 마지막으로 h도 해제
+
 	return 0;
 }
 
@@ -173,6 +183,26 @@ void printList(listNode* h) {
  */
 int insertLast(listNode* h, int key) {
 
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	listNode* n;
+	n = h;
+	node->key = key;
+	node->rlink = h;
+
+	if(n == NULL)
+	{
+		h = node; // 만약 리스트가 비어있을 때 처음 추가하게 되는 것이라면 바로 추가
+	}
+
+	else
+	{
+		while(n->rlink != NULL) 
+			n = n->rlink; // n의 rlink가 NULL 일 때까지, 즉 마지막 순서까지 n을 증가시킴
+		
+		n->rlink = node; // n의 rlink가 새로 추가할 node를 가리키게 함
+		node->llink = n; // 새로 추가한 node의 llink가 n을 가리키게 함
+	}
+
 	return 1;
 }
 
@@ -182,6 +212,28 @@ int insertLast(listNode* h, int key) {
  */
 int deleteLast(listNode* h) {
 
+	listNode* n, *trail;
+	n = h;
+	trail = NULL;
+
+	if(n == NULL)
+		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
+	
+	else{
+		if(h->rlink == NULL){ // 리스트에 노드가 하나 남아있다면
+			h = NULL; // first가 가리키고 있는 값 NULL로 변경
+			free(n); // n 해제
+			return 0;
+		}
+
+		while(n->rlink != NULL){ // 리스트의 마지막 노드까지
+			trail = n; // 이전 노드를 가리키는 trail의 값을 n으로 변경
+			n = n->rlink; // n이 다음 노드를 가리키도록 변경
+		}
+		// 리스트의 마지막 노드라면
+		trail->rlink = h;
+		free(n); // 마지막 노드인 n 해제
+	}
 
 	return 1;
 }
@@ -192,6 +244,12 @@ int deleteLast(listNode* h) {
  */
 int insertFirst(listNode* h, int key) {
 
+	listNode* node = (listNode*)malloc(sizeof(listNode));
+	node->key = key;
+
+	node->rlink = h; // node를 처음에 넣는 것이기 때문에 first가 가리키는 노드를 새로 추가할 node의 rlink가 가리키도록 함
+	h->llink = node; // first가 가리키는 node의 llink가 새로 추가할 노드를 가리키도록 함
+	h = node; // first가 새로 추가할 노드를 가리키도록 변경
 
 	return 1;
 }
@@ -201,9 +259,18 @@ int insertFirst(listNode* h, int key) {
  */
 int deleteFirst(listNode* h) {
 
+	listNode* n;
+	n = h;
+
+	if(n == NULL)
+		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
+	
+	else{
+		h = n->rlink; // first가 가리키는 값을 n의 다음 노드 값으로 변경한 후
+		free(n); // n의 메모리 해제
+	}
 
 	return 1;
-
 }
 
 
@@ -211,7 +278,20 @@ int deleteFirst(listNode* h) {
  * 리스트의 링크를 역순으로 재 배치
  */
 int invertList(listNode* h) {
+	
+	listNode* next, *trail, *n; // 다음 노드, 이전 노드, 현재 노드를 가리킬 포인터 선언
+	next = trail = NULL;
+	n = h;
 
+	while(n){
+		next = n->rlink; // next가 현재 노드의 다음 노드를 가리키도록 변경
+		n->rlink = trail; // 현재 노드의 rlink는 이전 노드를 가리키도록 변경
+		n->llink = next; // n의 llink는 다음 노드를 가리키도록 변경
+		trail = n; // 이전 노드는 현재 노드를 가리키도록 변경
+		n = next; // 현재 노드 n은 다음 노드를 가리키도록 변경
+	}
+	h->rlink = trail;
+	h = trail; // 마지막으로 first가 마지막 노드를 가리키도록 함
 
 	return 0;
 }
