@@ -125,10 +125,10 @@ int initialize(listNode** h) {
 /* 메모리 해제 */
 int freeList(listNode* h){
 
-	listNode* p = h;
+	listNode* p = h->rlink;
 	listNode* prev = NULL;
 
-	while(p != NULL) {
+	while(p != h) {
 		prev = p; // 이전 노드를 p로 변경
 		p = p->rlink; // p는 다음 노드를 가리키도록 변경
 		free(prev); // 노드를 하나씩 해제
@@ -189,10 +189,11 @@ int insertLast(listNode* h, int key) {
 	node->key = key;
 	node->rlink = h;
 
-	if(h == NULL)
+	if(h->rlink == h)
 	{
-		h = node; // 만약 리스트가 비어있을 때 처음 추가하게 되는 것이라면 바로 추가
-		node->llink = node;
+		h->llink = node;
+		h->rlink = node;
+		node->llink = h;
 	}
 
 	else
@@ -215,16 +216,18 @@ int insertLast(listNode* h, int key) {
 int deleteLast(listNode* h) {
 
 	listNode* n, *trail;
-	n = h;
+	n = h->rlink;
 	trail = NULL;
 
-	if(n == NULL)
+	if(h->rlink == h)
 		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
 	
 	else
 	{
-		if(h->rlink == h){ // 리스트에 노드가 하나 남아있다면
-			h = NULL; // first가 가리키고 있는 값 NULL로 변경
+		if(n->rlink == h) // 리스트에 노드가 하나 남아있다면
+		{
+			h->rlink = h; // first가 가리키고 있는 값 NULL로 변경
+			h->llink = h;
 			free(n); // n 해제
 
 			return 0;
@@ -252,9 +255,10 @@ int insertFirst(listNode* h, int key) {
 	listNode* node = (listNode*)malloc(sizeof(listNode));
 	node->key = key;
 
-	if(h == NULL)
+	if(h->rlink == h)
 	{
-		h = node;
+		h->llink = node;
+		h->rlink = node;
 		node->rlink = h;
 		node->llink = h;
 	}
@@ -262,9 +266,9 @@ int insertFirst(listNode* h, int key) {
 	else
 	{	
 		node->llink = h->llink;
-		node->rlink = h;
+		node->rlink = h->rlink;
 		h->llink = node; // first가 가리키는 node의 llink가 새로 추가할 노드를 가리키도록 함
-		h = node; // first가 새로 추가할 노드를 가리키도록 변경
+		h->rlink = node; // first가 새로 추가할 노드를 가리키도록 변경
 	}
 
 	return 1;
@@ -276,22 +280,23 @@ int insertFirst(listNode* h, int key) {
 int deleteFirst(listNode* h) {
 
 	listNode* n;
-	n = h;
+	n = h->rlink;
 
-	if(n == NULL)
+	if(h->rlink == h)
 		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
 	
 	else
 	{
-		if(h->rlink == h){ // 리스트에 노드가 하나 남아있다면
-			h = NULL; // first가 가리키고 있는 값 NULL로 변경
+		if(n->rlink == h){ // 리스트에 노드가 하나 남아있다면
+			h->rlink = h; // first가 가리키고 있는 값 NULL로 변경
+			h->llink = h;
 			free(n); // n 해제
 
 			return 0;
 		}
 
-		h = n->rlink; // first가 가리키는 값을 n의 다음 노드 값으로 변경한 후
-		h->llink = n->llink;
+		h->rlink = n->rlink; // first가 가리키는 값을 n의 다음 노드 값으로 변경한 후
+		n->rlink->llink = h;
 		free(n); // n의 메모리 해제
 	}
 
@@ -334,9 +339,11 @@ int insertNode(listNode* h, int key) {
 	n = h; // 처음 n의 값은 first가 가리키고 있는 노드
 	node->key = key; // 새로 생성한 노드의 데이터 값에 입력받은 데이터값 대입
 
-	if(n == NULL){
-		h = node; // 만약 리스트가 비어있었다면 first가 가리키고 있는 노드를 node로 변경
-		node->rlink = h; // node의 rlink는 NULL값으로 변경
+	if(h->rlink == h)
+	{
+		h->llink = node;
+		h->rlink = node;
+		node->rlink = h;
 		node->llink = h;
 	}
 	
@@ -384,23 +391,27 @@ int deleteNode(listNode* h, int key) {
 
 	listNode* n;
 	listNode* trail = NULL;
-	n = h;
+	n = h->rlink;
 
-	if(n == NULL)
+	if(h->rlink == h)
 		printf("Linked list is Empty!!\n\n"); // 리스트가 비어있으면 비어있다는 오류 문자열 출력
 	
 	else
 	{
-		if(h->key == key) // 만약 첫번째 노드의 키 값이 삭제할 노드의 키 값과 같다면
+		if(n->key == key) // 만약 첫번째 노드의 키 값이 삭제할 노드의 키 값과 같다면
 		{
-			if(h->rlink == h){ // 리스트에 노드가 하나 남아있다면
-				h = NULL; // first가 가리키고 있는 값 NULL로 변경
+			if(n->rlink == h){ // 리스트에 노드가 하나 남아있다면
+				h->rlink = h; // first가 가리키고 있는 값 NULL로 변경
+				h->llink = h;
 				free(n); // n 해제
-			}
+
+			return 0;
+		}
 
 			else
 			{
-				h = n->rlink; // first가 가리키는 노드를 n의 다음 노드로 변경 후
+				h->rlink = n->rlink; // first가 가리키는 노드를 n의 다음 노드로 변경 후
+				n->rlink->llink = h;
 				free(n); // n 해제
 			}
 		}
