@@ -129,13 +129,14 @@ int initializeBST(Node** h) {
 
 void inorderTraversal(Node* ptr)
 {
-	if(ptr == NULL)
-		return;
+	if(ptr)
+	{
+		inorderTraversal(ptr->left);
+		printf("%d", ptr->key);
+		inorderTraversal(ptr->right);
+	}	
 	
-	inorderTraversal(ptr->left);
-	printf("%d", ptr->key);
-	inorderTraversal(ptr->right);
-	
+
 }
 
 void preorderTraversal(Node* ptr)
@@ -151,7 +152,8 @@ void preorderTraversal(Node* ptr)
 
 void postorderTraversal(Node* ptr)
 {
-	if(ptr){
+	if(ptr)
+	{
 		postorderTraversal(ptr->left);
 		postorderTraversal(ptr->right);
 		printf("%d", ptr->key);
@@ -161,28 +163,90 @@ void postorderTraversal(Node* ptr)
 
 int insert(Node* head, int key)
 {
+	Node* newNode = (Node*)malloc(sizeof(Node));
+	newNode->key = key;
+	newNode->left = NULL;
+	newNode->right = NULL;
+	
+	Node *parent, *ptr;
 
+	if(head->left == NULL)
+		head->left = newNode;
+	
+	else
+	{
+		parent = head;
+		ptr = head->left;
+
+		while(ptr == NULL)
+		{
+			parent = ptr;
+
+			if (parent->key > newNode->key) ptr = parent->left;
+			else if (parent->key < newNode->key) ptr = parent->right;
+		}
+
+		if (parent->key > newNode->key) parent->left = newNode;
+		else if (parent->key < newNode->key) parent->right = newNode;
+	}
 }
 
 int deleteLeafNode(Node* head, int key)
 {
+	Node *parent, *ptr;
 
+	if(head->left == NULL)
+		printf("Binary-search-tree is Empty!!\n");
+	
+	else
+	{
+		parent = head;
+		ptr = head->left;
+
+		while(ptr->key == key)
+		{
+			parent = ptr;
+
+			if (parent->key > key) ptr = parent->left;
+			else if (parent->key < key) ptr = parent->right;
+		}
+
+		if (parent->key > key) parent->left = NULL;
+		else if (parent->key < key) parent->right = NULL;
+	}
 }
 
 Node* searchRecursive(Node* ptr, int key)
 {
-
+	if (ptr == NULL) return NULL;
+	else if (key == ptr->key) return ptr;
+	else if (key < ptr->key) return searchRecursive(ptr->left, key);
+	else if (key > ptr->key) return searchRecursive(ptr->right, key);
 }
 
 Node* searchIterative(Node* head, int key)
 {
+	Node *ptr = head->left;
 
+	if (head == NULL) return NULL;
+
+	while(ptr)
+	{
+		if (ptr->key == key) return ptr;
+		else if (key < ptr->key) ptr = ptr->left;
+		else if (key > ptr->key) ptr = ptr->right;
+	}
 }
 
 
 int freeBST(Node* head)
 {
-
+	if(head)
+	{
+		freeBST(head->left);
+		freeBST(head->right);
+		free(head);
+	}
 }
 
 
