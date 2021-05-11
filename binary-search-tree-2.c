@@ -154,6 +154,18 @@ void recursiveInorder(Node* ptr)
  */
 void iterativeInorder(Node* node)
 {
+	int top = -1;
+	Node stack[MAX_STACK_SIZE];
+
+	for(;;){
+		for(;node;node = node->left) push(node);
+		node = pop();
+
+		if(!node) break;
+
+		printf("%d", node->key);
+		node = node->right;
+	}
 }
 
 /**
@@ -161,6 +173,23 @@ void iterativeInorder(Node* node)
  */
 void levelOrder(Node* ptr)
 {
+	Node queue[MAX_QUEUE_SIZE];
+
+	if(!ptr) return;
+	enQueue(ptr);
+
+	for(;;){
+		ptr = deQueue();
+		
+		if(ptr){
+			ptrintf("%d", ptr->key);
+			if(ptr->left) enQueue(ptr->left);			
+			if(ptr->right) enQueue(ptr->right);
+		}
+
+		else break;
+	}
+	
 }
 
 
@@ -210,6 +239,43 @@ int insert(Node* head, int key)
 
 int deleteNode(Node* head, int key)
 {
+	Node *parent, *ptr; // 부모노드와 현재 노드를 확인하기 위한 포인터
+	parent = head->left; // parent가 root node를 가리키도록 함
+	ptr = parent;
+
+	if(head->left == NULL)
+		printf("Binary-search-tree is Empty!!\n"); // root node가 비어있을 경우
+	
+	else if (parent->left == NULL && parent->right == NULL) { // parent의 left와 right 모두가 NULL 일 경우 즉, root node만 존재할 경우
+		head->left = NULL; // root node를 NULL로 변경
+		free(parent); // root node 해제
+	}
+	
+	else
+	{
+		while(ptr->key != key) // ptr의 key값이 삭제할 key값과 같아질 때 까지
+		{
+			parent = ptr; // 부모노드의 값을 현재노드로 변경
+
+			if (parent->key > key) ptr = parent->left; // 부모노드의 key값이 입력받은 key값 보다 클 경우, 현재 노드를 부모노드의 left로 변경
+			else if (parent->key < key) ptr = parent->right; // 부모노드의 key값이 입력방은 key값 보다 작을 경우, 현재 노드를 부모노드의 right로 변경
+
+			if (ptr == NULL){ // 끝까지 비교했지만 해당 노드가 없을 경우
+				printf("There is no such node!!"); // 해당되는 노드가 없다는 오류 문자열 출력
+				return 0;
+			}
+		}
+
+		if(ptr->left != NULL || ptr->right != NULL){ // 해당되는 node를 찾았지만 그 노드의 left나 right가 NULL이 아닐 경우
+			printf("the node [%d] is not a leaf", ptr->key); // 해당 노드는 leaf node가 아님
+			return 0;
+		}
+
+		else if (parent->left == ptr) parent->left = NULL; // while문 종료 후 부모노드의 left가 ptr일 경우 left를 NULL로 변경
+		else if (parent->right == ptr) parent->right = NULL; // 부모노드의 right가 ptr일 경우 right를 NULL로 변경
+
+		free(ptr); // ptr 해제
+	}
 }
 
 
@@ -243,20 +309,39 @@ int freeBST(Node* head)
 
 Node* pop()
 {
+	Node *p;
+
+	if(top == -1) return NULL;
+	else p = stack[top--];
+
+	return p;
 }
 
 void push(Node* aNode)
 {
+	stack[++top] = aNode;
 }
 
 
 
 Node* deQueue()
 {
+	if (front == rear){
+		printf(" Ther is an error!! (dequeue) ");
+		return NULL;
+	}
+	front = (front + 1)%MAX_QUEUE_SIZE;
+	return queue[front];
 }
 
 void enQueue(Node* aNode)
 {
+	if (((rear+1)%MAX_QUEUE_SIZE) == front) {
+		printf(" There is an error!! (enqueue) ");
+		return;
+	}
+	rear = (rear + 1) % MAX_QUEUE_SIZE;
+	queue[rear] = aNode->key;
 }
 
 
