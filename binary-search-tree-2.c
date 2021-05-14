@@ -221,8 +221,8 @@ int insert(Node* head, int key)
 int deleteNode(Node* head, int key)
 {
 	Node *parent, *ptr, *del, *pdel; // 부모노드와 현재 노드를 확인하기 위한 포인터와 삭제를 위한 포인터 두 개
-	parent = head; // parent가 root node를 가리키도록 함
-	ptr = head->left;
+	parent = head; // parent가 head를 가리키도록 함
+	ptr = head->left; // ptr이 root node를 가리키도록 함
 
 	if(head->left == NULL)
 		printf("Binary-search-tree is Empty!!\n"); // root node가 비어있을 경우 오류 문자열 출력
