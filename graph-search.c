@@ -39,6 +39,9 @@ int rear = -1;
 Vertex* deQueue(); // 큐에서 삭제하는 함수
 void enQueue(Vertex* aNode); // 큐에 추가하는 함수
 
+int visitInfo[MAX_VERTEX];
+int VisitVertex(int visitV);
+
 Graph* initialize(Graph *G);
 int freeGraph(Graph *G);
 int insertVertex(Graph *G, int v);
@@ -46,6 +49,8 @@ int insertEdge(Graph *G, int u, int v);
 int DepthFS(Graph *G, int v);
 int BreathFS(Graph *G, int v);
 void printGraph(Graph *G);
+int CheckV(Graph *G, int v);
+void initVist();
 
 int main()
 {
@@ -114,10 +119,11 @@ Graph* initialize(Graph *G)
 {
 	if(G != NULL) freeGraph(G);
 
-	Graph *temp = (Vertex*)malloc(sizeof(Vertex));
+	Graph *temp = (Graph*)malloc(sizeof(Graph)*MAX_VERTEX);
+
 	for(int i = 0; i < MAX_VERTEX; i++){
 		temp[i].Head = NULL;
-		//temp[i] = 0;
+		visitInfo[i] = 0;
 	}
 
 	top = -1;
@@ -132,11 +138,14 @@ int freeGraph(Graph *G)
 
 	for(int i = 0; i < MAX_VERTEX; i++){
 		n = G[i].Head;
-		while(n != NULL){
+
+		if(n == NULL) free(n);
+		else{
+			while(n != NULL){
 			free(n);
 			n = n->link;
+			}
 		}
-		if((G + i) != NULL) free(G[i].Head);
 	}
 	free(G);
 }
@@ -147,21 +156,22 @@ int insertVertex(Graph *G, int v)
 	new->data = v;
 	new->link = NULL;
 
-	if(G->Head != NULL){
-		printf("The Vertex of [%d] already exists!!\n", v);
-		return 0;
-	}
-
-	else if (v > MAX_VERTEX){
+	if (v > MAX_VERTEX){
 		printf("[%d] is out of range!!\n");
 		return 0;
 	}
 
+	else if(G[v].Head != NULL){
+		printf("The Vertex of [%d] already exists!!\n", v);
+		return 0;
+	}
+
 	else{
-		G->Head = new;
+		G[v].Head = new;
 		return 0;
 	}
 }
+
 int insertEdge(Graph *G, int u, int v)
 {
 	Vertex *new = (Vertex*)malloc(sizeof(Vertex));
@@ -172,13 +182,8 @@ int insertEdge(Graph *G, int u, int v)
 	n = G[u].Head;
 	trail = n;
 
-	if(u > MAX_VERTEX || v > MAX_VERTEX){
-		printf("Vertex is out of range!!");
-		return 0;
-	}
-
-	else if(G[u].Head == NULL || G[v].Head == NULL){
-		printf("There is no such vertex..\n");
+	if(CheckV(G, u) != 1 || CheckV(G, v) != 1) {
+		printf("There is an error!!");
 		return 0;
 	}
 
@@ -212,15 +217,75 @@ int insertEdge(Graph *G, int u, int v)
 	}
 }
 int DepthFS(Graph *G, int v)
-{}
+{
+	Vertex *w;
+	initVist();
+
+	printf("%d ", v);
+	VisitVertex(v);
+
+	for(w = G[v].Head->link; w; w = w->link)
+		if(visitInfo[w->data] == 0)
+			DepthFS(G, w->data);
+	
+	return 0;
+}
+
 int BreathFS(Graph *G, int v)
-{}
+{
+	int i;
+	Vertex *m, *n;
+	initVist();
+
+	if(G == NULL) return 0;
+	else if(CheckV(G, v) == 0) return 0;
+	else{
+		enQueue(G[v].Head);
+		VisitVertex(v);
+		printf("%d ", v);
+
+		while(front != rear){
+			m = deQueue();
+			for(n = G[m->data].Head; n; n = n->link)
+				if(visitInfo[n->data] == 0){
+					VisitVertex(n->data);
+					printf("%d ", n->data);
+					enQueue(n);
+				}
+		}			
+	}
+
+}
+
+int CheckV(Graph *G, int v)
+{
+	if(v > MAX_VERTEX) return 0;
+
+	else if(G[v].Head == NULL) return 0;
+
+	else return 1;
+}
+
+int VisitVertex(int visitV)
+{
+	if(visitInfo[visitV] == 0){
+		visitInfo[visitV] = 1;
+		return 0; // 방문한 적이 없으면 0 반환
+	}
+	return 1; // 방문했었으면 1 반환
+}
+
+void initVist()
+{
+	for(int i = 0; i<MAX_VERTEX; i++) visitInfo[i] = 0;	
+	for(int j = 0; j<MAX_QUEUE_SIZE; j++) queue[j] = NULL;
+	front = rear = -1;
+}
+
 void printGraph(Graph *G)
 {
 	int i = 0;
 	Vertex *p, *n;
-	p = G[i].Head;
-	n = p->link;
 
 	printf("\n---PRINT\n");
 
@@ -230,19 +295,23 @@ void printGraph(Graph *G)
 	}
 
 	while(i < MAX_VERTEX){
-		if(p == NULL) p = G[++i].Head;
+		p = G[i].Head;		
+
+		if(p == NULL) i++;
 
 		else{
-			printf("%d의 인접리스트", i);
+			printf("Adjacent list of %d", i);
+			n = p->link;
+
 			while(n != NULL){				
 				printf("-> %d", n->data);
 				n = n->link;
 			}
 			printf("\n");
 			i++;
-			p = G[i].Head;
 		}
 	}
+	return;
 }
 
 Vertex* pop()
