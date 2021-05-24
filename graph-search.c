@@ -18,12 +18,8 @@ typedef struct Vertex{
 	struct Vertex *link;
 } Vertex;
 
-typedef struct VertexHead {
-	Vertex *Vhead;
-} VertexHead;
-
 typedef struct Graph {
-	VertexHead *Head;
+	Vertex *Head;
 } Graph;
 
 /* for stack */
@@ -49,7 +45,7 @@ int insertVertex(Graph *G, int v);
 int insertEdge(Graph *G, int u, int v);
 int DepthFS(Graph *G, int v);
 int BreathFS(Graph *G, int v);
-int printGraph(Graph *G);
+void printGraph(Graph *G);
 
 int main()
 {
@@ -97,6 +93,7 @@ int main()
 			printf("Your Num = ");
 			scanf("%d %d", &u, &v);
 			insertEdge(graph, u, v);
+			insertEdge(graph, v, u);
 			break;
 		case 'b': case 'B':
 			printf("Your Num = ");
@@ -117,7 +114,7 @@ Graph* initialize(Graph *G)
 {
 	if(G != NULL) freeGraph(G);
 
-	Graph *temp = (VertexHead*)malloc(sizeof(VertexHead));
+	Graph *temp = (Vertex*)malloc(sizeof(Vertex));
 	for(int i = 0; i < MAX_VERTEX; i++){
 		temp[i].Head = NULL;
 		//temp[i] = 0;
@@ -134,26 +131,119 @@ int freeGraph(Graph *G)
 	Vertex* n;
 
 	for(int i = 0; i < MAX_VERTEX; i++){
-		n = G[i].Head->Vhead;
+		n = G[i].Head;
 		while(n != NULL){
 			free(n);
 			n = n->link;
 		}
-		free(G[i].Head);
+		if((G + i) != NULL) free(G[i].Head);
 	}
 	free(G);
 }
 
 int insertVertex(Graph *G, int v)
-{}
+{
+	Vertex *new = (Vertex*)malloc(sizeof(Vertex));
+	new->data = v;
+	new->link = NULL;
+
+	if(G->Head != NULL){
+		printf("The Vertex of [%d] already exists!!\n", v);
+		return 0;
+	}
+
+	else if (v > MAX_VERTEX){
+		printf("[%d] is out of range!!\n");
+		return 0;
+	}
+
+	else{
+		G->Head = new;
+		return 0;
+	}
+}
 int insertEdge(Graph *G, int u, int v)
-{}
+{
+	Vertex *new = (Vertex*)malloc(sizeof(Vertex));
+	new->data = v;
+	new->link = NULL;
+
+	Vertex *n, *trail;
+	n = G[u].Head;
+	trail = n;
+
+	if(u > MAX_VERTEX || v > MAX_VERTEX){
+		printf("Vertex is out of range!!");
+		return 0;
+	}
+
+	else if(G[u].Head == NULL || G[v].Head == NULL){
+		printf("There is no such vertex..\n");
+		return 0;
+	}
+
+	else
+	{
+		if (n->link == NULL) {
+			n->link = new;
+			return 0;
+		}
+		/* key를 기준으로 삽입할 위치를 찾는다 */
+		while(n != NULL) {
+			if(n->data >= v) {
+				/* 첫 노드 앞쪽에 삽입해야할 경우 인지 검사 */
+				if(n == G[u].Head) {
+					G[u].Head->link = new;
+					new->link = n->link;
+				} 
+				else { /* 중간이거나 마지막인 경우 */
+					new->link = n;
+					trail->link = new;
+				}
+				return 0;
+			}
+			trail = n;
+			n = n->link;
+		}
+
+		/* 마지막 노드까지 찾지 못한 경우 , 마지막에 삽입 */
+		trail->link = new;
+		return 0;
+	}
+}
 int DepthFS(Graph *G, int v)
 {}
 int BreathFS(Graph *G, int v)
 {}
-int printGraph(Graph *G)
-{}
+void printGraph(Graph *G)
+{
+	int i = 0;
+	Vertex *p, *n;
+	p = G[i].Head;
+	n = p->link;
+
+	printf("\n---PRINT\n");
+
+	if(G == NULL){
+		printf("Nothing to print....\n");
+		return;
+	}
+
+	while(i < MAX_VERTEX){
+		if(p == NULL) p = G[++i].Head;
+
+		else{
+			printf("%d의 인접리스트", i);
+			while(n != NULL){				
+				printf("-> %d", n->data);
+				n = n->link;
+			}
+			printf("\n");
+			i++;
+			p = G[i].Head;
+		}
+	}
+}
 
 Vertex* pop()
 {
