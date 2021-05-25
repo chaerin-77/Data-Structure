@@ -22,14 +22,6 @@ typedef struct Graph {
 	Vertex *Head;
 } Graph;
 
-/* for stack */
-#define MAX_STACK_SIZE		20 // 스택의 최대 크기를 20으로 저장
-Vertex* stack[MAX_STACK_SIZE];
-int top = -1;
-
-Vertex* pop(); // 스택을 pop하는 함수
-void push(Vertex* aNode); // 스텍에 push하는 함수
-
 /* for queue */
 #define MAX_QUEUE_SIZE		20 // 큐의 최대 크기를 20으로 저장
 Vertex* queue[MAX_QUEUE_SIZE];
@@ -37,7 +29,7 @@ int front = -1;
 int rear = -1;
 
 Vertex* deQueue(); // 큐에서 삭제하는 함수
-void enQueue(Vertex* aNode); // 큐에 추가하는 함수
+void enQueue(Vertex* v); // 큐에 추가하는 함수
 
 int visitInfo[MAX_VERTEX];
 int VisitVertex(int visitV);
@@ -89,6 +81,7 @@ int main()
 		case 'd': case 'D':
 			printf("Your Num = ");
 			scanf("%d", &v);
+			initVist();
 			DepthFS(graph, v);
 			break;
 		case 'p': case 'P':
@@ -126,24 +119,23 @@ Graph* initialize(Graph *G)
 		visitInfo[i] = 0;
 	}
 
-	top = -1;
-	front = rear = -1;
+	initVist();
 
 	return temp;
 }
 
 int freeGraph(Graph *G)
 {
-	Vertex* n;
+	Vertex *n, *trail;
 
 	for(int i = 0; i < MAX_VERTEX; i++){
 		n = G[i].Head;
 
-		if(n == NULL) free(n);
-		else{
+		if(n != NULL) {
 			while(n != NULL){
-			free(n);
-			n = n->link;
+				trail = n;
+				n = n->link;
+				free(trail);				
 			}
 		}
 	}
@@ -187,39 +179,37 @@ int insertEdge(Graph *G, int u, int v)
 		return 0;
 	}
 
-	else
-	{
-		if (n->link == NULL) {
-			n->link = new;
-			return 0;
-		}
-		/* key를 기준으로 삽입할 위치를 찾는다 */
-		while(n != NULL) {
-			if(n->data >= v) {
-				/* 첫 노드 앞쪽에 삽입해야할 경우 인지 검사 */
-				if(n == G[u].Head) {
-					G[u].Head->link = new;
-					new->link = n->link;
-				} 
-				else { /* 중간이거나 마지막인 경우 */
-					new->link = n;
-					trail->link = new;
-				}
-				return 0;
-			}
-			trail = n;
-			n = n->link;
-		}
-
-		/* 마지막 노드까지 찾지 못한 경우 , 마지막에 삽입 */
-		trail->link = new;
+	if (n->link == NULL) {
+		n->link = new;
 		return 0;
 	}
+	n = n->link;
+		/* key를 기준으로 삽입할 위치를 찾는다 */
+	while(n != NULL) {
+		if(n->data > v) {
+				/* 첫 노드 앞쪽에 삽입해야할 경우 인지 검사 */
+			if(n == G[u].Head->link) {
+				new->link = G[u].Head->link;
+				G[u].Head->link = new;				
+			} 
+			else { /* 중간이거나 마지막인 경우 */
+				new->link = trail->link;
+				trail->link = new;
+			}
+			return 0;
+		}
+		else if(n->data == v) return 0;
+		trail = n;
+		n = n->link;
+	}
+		/* 마지막 노드까지 찾지 못한 경우 , 마지막에 삽입 */
+	trail->link = new;
+	return 0;
 }
+
 int DepthFS(Graph *G, int v)
 {
 	Vertex *w;
-	initVist();
 
 	printf("%d ", v);
 	VisitVertex(v);
@@ -284,7 +274,6 @@ void initVist()
 
 void printGraph(Graph *G)
 {
-	int i = 0;
 	Vertex *p, *n;
 
 	printf("\n---PRINT\n");
@@ -294,13 +283,11 @@ void printGraph(Graph *G)
 		return;
 	}
 
-	while(i < MAX_VERTEX){
-		p = G[i].Head;		
+	for(int i = 0; i < MAX_VERTEX; i++){
+		p = G[i].Head;
 
-		if(p == NULL) i++;
-
-		else{
-			printf("Adjacent list of %d", i);
+		if(p != NULL){
+			printf("Adjacent list of [%d]", i);
 			n = p->link;
 
 			while(n != NULL){				
@@ -308,25 +295,9 @@ void printGraph(Graph *G)
 				n = n->link;
 			}
 			printf("\n");
-			i++;
 		}
 	}
 	return;
-}
-
-Vertex* pop()
-{
-	Vertex *p; // node를 가리키는 포인터 p 생성
-
-	if(top == -1) return NULL; // stack이 비어있으면 바로 종료
-	else p = stack[top--]; // 그렇지 않으면 p에 스택의 top 값을 받고 top의 값을 하나 감소시킴
-
-	return p; // p반환
-}
-
-void push(Vertex* v)
-{
-	stack[++top] = v; // 스택의 top을 하나 증가시키면서 해당 값 저장
 }
 
 Vertex* deQueue()
@@ -338,12 +309,12 @@ Vertex* deQueue()
 	return queue[front]; // 해당 인덱스의 큐 값 반환
 }
 
-void enQueue(Vertex* aNode)
+void enQueue(Vertex* v)
 {
 	if (((rear+1)%MAX_QUEUE_SIZE) == front) { // rear의 다음 값이 front일 경우 즉, 큐가 포화상태일 경우
 		printf(" There is an error!! (queue is full)"); // 오류 문자열 출력
 		return;
 	}
 	rear = (rear + 1) % MAX_QUEUE_SIZE; // rear의 값을 한 칸 증가시킴
-	queue[rear] = aNode; // 증가시킨 rear에 해당하는 큐에 저장
+	queue[rear] = v; // 증가시킨 rear에 해당하는 큐에 저장
 }
