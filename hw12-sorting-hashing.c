@@ -69,7 +69,7 @@ int main()
 			initialize(&array); // 배열 초기화
 			break;
 		case 'q': case 'Q':
-			freeArray(array); // 사용한 배열 해제
+			freeArray(array); // 종료 시 사용한 배열 해제
 			break;
 		case 's': case 'S':
 			selectionSort(array); // 선택 정렬
@@ -86,27 +86,27 @@ int main()
 		case 'k': case 'K':
 			printf("Quick Sort: \n");
 			printf("----------------------------------------------------------------\n");
-			printArray(array);
+			printArray(array); // 정렬 전 배열 출력
 			quickSort(array, MAX_ARRAY_SIZE); // 퀵 정렬
 			printf("----------------------------------------------------------------\n");
-			printArray(array);
+			printArray(array); // 정렬된 배열 출력
 
 			break;
 
 		case 'h': case 'H':
 			printf("Hashing: \n");
 			printf("----------------------------------------------------------------\n");
-			printArray(array);
+			printArray(array); // 정렬 전 배열 출력
 			hashing(array, &hashtable); // 해싱
-			printArray(hashtable);
+			printArray(hashtable); // 정렬된 배열 출력
 			break;
 
 		case 'e': case 'E':
 			printf("Your Key = ");
 			scanf("%d", &key);
-			printArray(hashtable);
+			printArray(hashtable); // hashing 전 배열 출력
 			index = search(hashtable, key); // 해시 테이블에서 해당되는 키 찾기
-			printf("key = %d, index = %d,  hashtable[%d] = %d\n", key, index, index, hashtable[index]);
+			printf("key = %d, index = %d,  hashtable[%d] = %d\n", key, index, index, hashtable[index]); // 어느 위치에 해당되는 값이 있는지 인덱스값, 해당 값 출력
 			break;
 
 		case 'p': case 'P':
@@ -260,7 +260,7 @@ int shellSort(int *a)
 
 	for (h = MAX_ARRAY_SIZE/2; h > 0; h /= 2) // 처음 h의 값을 전체 배열의 절반으로 설정함. 반복 할 수록 h의 값을 절반으로 변경함
 	{
-		for (i = 0; i < h; i++) // i가 0부터 h보다 작을 때 까지 하나씩 증가
+		for (i = 0; i < h; i++) // i가 0부터 h보다 작을 동안 하나씩 증가
 		{
 			for(j = i + h; j < MAX_ARRAY_SIZE; j += h) // j는 i로부터 h만큼 떨어져 있는 곳부터 시작하여 배열의 끝까지 비교
 			{
