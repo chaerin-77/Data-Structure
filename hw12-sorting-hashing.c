@@ -40,7 +40,7 @@ int search(int *ht, int key);
 
 int main()
 {
-	printf("[----- [Chaerin Jung] [2020039022] -----]");
+	printf("[----- [Chaerin Jung] [2020039022] -----]\n\n");
 
 	char command;
 	int *array = NULL;
@@ -135,7 +135,7 @@ int initialize(int** a)
 
 	/* 랜덤값을 배열의 값으로 저장 */
 	for(int i = 0; i < MAX_ARRAY_SIZE; i++)
-		temp[i] = rand() % MAX_ARRAY_SIZE;
+		temp[i] = rand() % MAX_ARRAY_SIZE; // 0~12의 범위 안에 해당되는 난수를 저장
 
 	return 0;
 }
