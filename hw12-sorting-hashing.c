@@ -232,7 +232,7 @@ int bubbleSort(int *a)
 
 	for(i = 0; i < MAX_ARRAY_SIZE; i++)
 	{
-		for (j = 0; j < MAX_ARRAY_SIZE; j++)
+		for (j = 1; j < MAX_ARRAY_SIZE; j++)
 		{
 			if (a[j-1] > a[j]) // a의 j번째와 그 앞의 값 두개를 비교한 후 만약 앞의 값이 더 크다면
 			{
