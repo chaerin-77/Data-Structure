@@ -316,7 +316,7 @@ int quickSort(int *a, int n)
 }
 
 int hashCode(int key) {
-   return key % MAX_HASH_TABLE_SIZE;
+   return key % MAX_HASH_TABLE_SIZE; // 해시테이블에 저장하기 위한 코드는 나머지 연산을 사용함
 }
 
 int hashing(int *a, int **ht)
@@ -332,7 +332,7 @@ int hashing(int *a, int **ht)
 	}
 
 	for(int i = 0; i < MAX_HASH_TABLE_SIZE; i++)
-		hashtable[i] = -1;
+		hashtable[i] = -1; // 해시테이블의 각 값을 -1로 초기화
 
 	/*
 	for(int i = 0; i < MAX_HASH_TABLE_SIZE; i++)
@@ -342,28 +342,30 @@ int hashing(int *a, int **ht)
 	int key = -1;
 	int hashcode = -1;
 	int index = -1;
-	for (int i = 0; i < MAX_ARRAY_SIZE; i++)
+
+	for (int i = 0; i < MAX_ARRAY_SIZE; i++) // i는 0부터 13보다 작을 때까지 하나씩 증가
 	{
-		key = a[i];
-		hashcode = hashCode(key);
+		key = a[i]; // key는 a의 i번째 값으로 설정
+		hashcode = hashCode(key); // hashCode 함수를 통해서 인덱스 번호 하나를 받아옴
 		/*
 		printf("key = %d, hashcode = %d, hashtable[%d]=%d\n", key, hashcode, hashcode, hashtable[hashcode]);
 		*/
-		if (hashtable[hashcode] == -1)
+		if (hashtable[hashcode] == -1) // 만약 해시테이블의 해당 인덱스가 비어있을 경우
 		{
-			hashtable[hashcode] = key;
-		} else 	{
+			hashtable[hashcode] = key; // 해당 위치에 key값 저장
 
-			index = hashcode;
+		} else 	{ // 비어있지 않았다면
 
-			while(hashtable[index] != -1)
+			index = hashcode; // index를 저장하려던 인덱스번호로 설정
+
+			while(hashtable[index] != -1) // 해시테이블의 빈 곳을 찾을 때까지
 			{
-				index = (++index) % MAX_HASH_TABLE_SIZE;
+				index = (++index) % MAX_HASH_TABLE_SIZE; // index의 값을 하나씩 증가함
 				/*
 				printf("index = %d\n", index);
 				*/
 			}
-			hashtable[index] = key;
+			hashtable[index] = key; // 해시테이블의 index번째에 key값을 저장
 		}
 	}
 
@@ -372,14 +374,14 @@ int hashing(int *a, int **ht)
 
 int search(int *ht, int key)
 {
-	int index = hashCode(key);
+	int index = hashCode(key); // hashCode함수를 통해 인덱스 번호 하나를 받아옴
 
 	if(ht[index] == key)
-		return index;
+		return index; // 만약 함수를 통해 받아온 인덱스 번호에 해당되는 key값이 있다면 index 반환
 
-	while(ht[++index] != key)
+	while(ht[++index] != key) // 그게 아니라면 해당되는 key값이 나올때까지 index번호 부터 하나씩 index를 증가
 	{
-		index = index % MAX_HASH_TABLE_SIZE;
+		index = index % MAX_HASH_TABLE_SIZE; // index의 값이 범위 안에 있도록 연산
 	}
-	return index;
+	return index; // 그 후 index 반환
 }
